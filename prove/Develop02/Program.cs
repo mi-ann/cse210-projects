@@ -1,3 +1,6 @@
+/* To exceed reuirements I added a login and register feature. This way a user can login with their password to their journal.
+ For this i created two additional classes and a users.txt file that saves all registered users*/
+ 
 using System;
 using System.Collections.Generic;
 
