@@ -16,11 +16,43 @@ public class BreathingActivity : Activity
         DateTime endBreathTime = currentBreathTime.AddSeconds(_duration);
         while (DateTime.Now < endBreathTime)
         {
-            Console.WriteLine("Breathe in...");
-            ShowCountDown(breathTime);
+             // Check if we are still within the allowed time
+            if (DateTime.Now >= endBreathTime)
+                break;
 
+            Console.WriteLine("Breathe in...");
+            var tokenSource = new CancellationTokenSource();
+            var task = Task.Run(() => ShowCountDown(breathTime), tokenSource.Token);
+
+            // Allow time to breathe in before checking again
+            while (!task.IsCompleted)
+            {
+                if (DateTime.Now >= endBreathTime)
+                {
+                    tokenSource.Cancel();
+                    Console.Write("\b \b"); // Cancel the countdown if the time is up
+                    break;
+                }
+                Thread.Sleep(100); // Small delay to prevent tight looping
+            }
+
+            // Breathe out phase
             Console.WriteLine("Breathe out...");
-            ShowCountDown(breathTime);
+            tokenSource = new CancellationTokenSource();
+            task = Task.Run(() => ShowCountDown(breathTime), tokenSource.Token);
+
+            // Allow time to breathe out before checking again
+            while (!task.IsCompleted)
+            {
+                if (DateTime.Now >= endBreathTime)
+                {
+                    tokenSource.Cancel();
+                    Console.Write("\b \b"); // Cancel the countdown if the time is up
+                    break;
+                }
+                Thread.Sleep(100); // Small delay to prevent tight looping
+            }
+
             Console.WriteLine(" ");
         }
 
