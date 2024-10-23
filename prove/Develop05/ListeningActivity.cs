@@ -34,16 +34,37 @@ public class ListingActivity : Activity
 
         List<string> responses = new List<string>();
         Console.WriteLine("Start listing! (Type 'done' when finished):");
+        CancellationTokenSource cts = new CancellationTokenSource();
+        DateTime endListenTime = DateTime.Now.AddSeconds(_duration);
 
-        DateTime currentListenTime = DateTime.Now;
-        DateTime endListenTime = currentListenTime.AddSeconds(_duration);
-        while (DateTime.Now < endListenTime)
+        // Start a task to manage the timing
+        Task.Run(() =>
         {
+            Thread.Sleep(_duration * 1000); // Wait for the duration
+            cts.Cancel(); // Cancel the input
+        });
+
+        while (true)
+        {
+            // Check if time is up
+            if (DateTime.Now >= endListenTime)
+            {
+                Console.WriteLine("Time is up!");
+                break;
+            }
+
+            // Check if cancellation has been requested
+            if (cts.Token.IsCancellationRequested)
+            {
+                Console.WriteLine("Time is up!");
+                break;
+            }
+
             string response = Console.ReadLine();
             if (response.ToLower() == "done")
                 break;
+
             responses.Add(response);
-            currentListenTime = DateTime.Now;
         }
 
         Console.WriteLine($"You listed {responses.Count} items.");
