@@ -10,7 +10,10 @@ class Program
         while (true)
         {
            DisplayMenu();
-           HandleUserResponse();
+           if (!HandleUserResponse()) // Check if the user wants to exit
+            {
+                break; // Exit the loop if the user selected option 4
+            }
         }
     }
 
@@ -23,7 +26,7 @@ class Program
         Console.WriteLine("4. Exit");
         Console.Write("Select a choice from the menu: ");
     }
-    static void HandleUserResponse()
+    static bool HandleUserResponse()
     {
         string choice = Console.ReadLine();
 
@@ -44,13 +47,14 @@ class Program
         }
         else if (choice == "4")
         {
-            return; // Exit the program
+            return false; // Exit the program
         }
         else
         {
             Console.WriteLine("Invalid choice. Please try again.");
-            return; // Prompt the user again
+            return true; // Prompt the user again
         }  
+        return true;
     }
 
     static void HandleActivity(BreathingActivity activity)

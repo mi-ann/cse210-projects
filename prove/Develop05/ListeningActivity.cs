@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 public class ListingActivity : Activity
 {
@@ -12,6 +13,8 @@ public class ListingActivity : Activity
         "When have you felt the Holy Ghost this month?",
         "Who are some of your personal heroes?"
     };
+
+    private bool isActive;
 
     public ListingActivity(string name, string description) : base(name, description)
     {
@@ -31,44 +34,55 @@ public class ListingActivity : Activity
         Console.WriteLine("List as many responses as you can to the following prompt:");
         Console.WriteLine($" --- {prompt} --- ");
         ShowCountDown(4); // Give user time to think
-
-        List<string> responses = new List<string>();
-        Console.WriteLine("Start listing! (Type 'done' when finished):");
         CancellationTokenSource cts = new CancellationTokenSource();
-        DateTime endListenTime = DateTime.Now.AddSeconds(_duration);
+        List<string> responses = new List<string>();
+        isActive = true;
+        Console.WriteLine("Start listing! (Type 'done' when finished):");
 
-        // Start a task to manage the timing
-        Task.Run(() =>
-        {
-            Thread.Sleep(_duration * 1000); // Wait for the duration
-            cts.Cancel(); // Cancel the input
-        });
 
-        while (true)
-        {
-            // Check if time is up
-            if (DateTime.Now >= endListenTime)
+        // Start the timer in a separate task
+        Task.Run(() => StartTimer(cts));
+
+        while (isActive == true)
+        {   
+            if (Console.KeyAvailable) // Check if a key is pressed
             {
-                Console.WriteLine("Time is up!");
-                break;
+                string response = Console.ReadLine();
+                if (response.ToLower() == "done")
+                {  
+                    isActive = false;
+                    break;
+                }
+
+                responses.Add(response);
             }
 
-            // Check if cancellation has been requested
             if (cts.Token.IsCancellationRequested)
             {
-                Console.WriteLine("Time is up!");
+                Console.WriteLine("\nTime is up!"); // Notify the user that time is up
+                isActive = false;
                 break;
             }
 
-            string response = Console.ReadLine();
-            if (response.ToLower() == "done")
-                break;
-
-            responses.Add(response);
+            
         }
-
         Console.WriteLine($"You listed {responses.Count} items.");
         DisplayEndingMessage();
+
         
+        
+    }
+
+    private void StartTimer(CancellationTokenSource cts)
+    {
+        for (int i = _duration; i > 0; i--)
+        {
+            Thread.Sleep(1000); // Sleep for 1 second
+        }
+
+        // Signal cancellation when time is up
+        cts.Cancel();
+        isActive = false;
+
     }
 }
