@@ -1,0 +1,7 @@
+300
+SimpleGoal: Give a sacrament talk, Give a sacrament talk when asked, 100, True
+EternalGoal: Study the scriptures, study a scriptures for 1 hour per day, 50
+ChecklistGoal: Go to the temple, Perform or attend ordinances, 550, 500, 3, 3 
+SimpleGoal: play piano, play piano for 30 min, 50, False
+EternalGoal: repent, repent daily, 50
+ChecklistGoal: play piano, play piano for 1 hour, 100, 400, 3, 0 
